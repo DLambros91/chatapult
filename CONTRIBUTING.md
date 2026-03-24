@@ -44,7 +44,7 @@ To ensure the codebase remains maintainable, highly adoptable, and standard acro
 
 We use `pre-commit` to automatically run formatting (`black`), linting (`ruff`), and type-checking (`mypy`) every time you make a commit. This catches errors locally before the code is added to the codebase.
 
-1. **Install the pre-commit package:** 
+1. **Install the pre-commit package:**
 ```bash
 pip install pre-commit
 ```
