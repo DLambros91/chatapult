@@ -2,7 +2,7 @@
 
 # Chatapult
 
-A fast, Pythonic API wrapper for Google Chat webhooks. 
+A fast, Pythonic API wrapper for Google Chat webhooks.
 
 Chatapult is designed to make sending automated notifications, CI/CD alerts, and rich UI cards to Google Workspace Spaces effortless. Whether you need a simple synchronous alert or a high-throughput async notification integration, Chatapult handles the boilerplate so you can focus on your application.
 
