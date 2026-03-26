@@ -1,4 +1,4 @@
-![Chatapult Banner](images/banner.png)
+![Chatapult Banner](https://raw.githubusercontent.com/DLambros91/chatapult/refs/heads/main/images/banner.png)
 
 # Chatapult
 
@@ -6,8 +6,10 @@ A fast, Pythonic API wrapper for Google Chat webhooks.
 
 Chatapult is designed to make sending automated notifications, CI/CD alerts, and rich UI cards to Google Workspace Spaces effortless. Whether you need a simple synchronous alert or a high-throughput async notification integration, Chatapult handles the boilerplate so you can focus on your application.
 
+[![PyPI Version](https://img.shields.io/pypi/v/chatapult.svg)](https://pypi.org/project/chatapult/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/chatapult.svg)](https://pypi.org/project/chatapult/)
 ![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://raw.githubusercontent.com/DLambros91/chatapult/refs/heads/main/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## Features
@@ -76,8 +78,8 @@ if __name__ == "__main__":
 Documentation for sending V2 Cards, threaded replies, and handling rate-limit exceptions will be added here as features are released.
 
 ## Contributing
-Contributions are welcome! If you'd like to help improve Chatapult, please review our [Contributing Guidelines](CONTRIBUTING.md) and open an issue or pull request.
+Contributions are welcome! If you'd like to help improve Chatapult, please review our [Contributing Guidelines](https://raw.githubusercontent.com/DLambros91/chatapult/refs/heads/main/CONTRIBUTING.md) and open an issue or pull request.
 
 ## License
 
-This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
+This project is licensed under the MIT License - see [LICENSE](https://raw.githubusercontent.com/DLambros91/chatapult/refs/heads/main/LICENSE) for details.
