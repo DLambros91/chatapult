@@ -92,6 +92,23 @@ def test_async_client_init_empty_url() -> None:
 
 
 @pytest.mark.asyncio
+async def test_async_send_message_with_thread(httpx_mock: HTTPXMock) -> None:
+    """Test sending a message to a specific thread (async)."""
+    httpx_mock.add_response(json={}, status_code=200)
+    thread_id = "spaces/SPACE_ID/threads/THREAD_ID"
+
+    async with AsyncChatClient(WEBHOOK_URL) as client:
+        await client.send_message("Async reply message", thread_name=thread_id)
+
+    request = httpx_mock.get_request()
+    assert request is not None
+
+    # Verify thread payload is included by parsing the JSON
+    request_data = json.loads(request.read())
+    assert request_data["thread"]["name"] == thread_id
+
+
+@pytest.mark.asyncio
 async def test_async_send_message_success(httpx_mock: HTTPXMock) -> None:
     """Test sending a basic text message successfully (async)."""
     mock_response = {"name": "spaces/SPACE/messages/MSG", "text": "Async Hello!"}
