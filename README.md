@@ -7,6 +7,9 @@ A fast, Pythonic API wrapper for Google Chat webhooks.
 Chatapult is designed to make sending automated notifications, CI/CD alerts, and rich UI cards to Google Workspace Spaces effortless. Whether you need a simple synchronous alert or a high-throughput async notification integration, Chatapult handles the boilerplate so you can focus on your application.
 
 ![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 ## Features
 
 * **Zero Boilerplate:** Send a message to a Google Chat Space in three lines of code.
@@ -32,7 +35,17 @@ pip install chatapult
 Perfect for simple scripts, cron jobs, or basic data pipelines.
 
 ```python
-CODE HERE
+import os
+from chatapult import ChatClient, APIError
+
+webhook_url = os.environ.get("GOOGLE_CHAT_WEBHOOK_URL")
+
+try:
+    with ChatClient(webhook_url) as client:
+        response = client.send_message("Hello from Chatapult!")
+        print("Message sent successfully!")
+except APIError as e:
+    print(f"Failed to send message: {e}")
 ```
 
 ### Asynchronous Usage
@@ -40,7 +53,22 @@ CODE HERE
 Ideal for web servers, async task queues, or applications where you cannot block the main thread.
 
 ```python
-CODE HERE
+import asyncio
+import os
+from chatapult import AsyncChatClient, NetworkError
+
+async def main():
+    webhook_url = os.environ.get("GOOGLE_CHAT_WEBHOOK_URL")
+
+    try:
+        async with AsyncChatClient(webhook_url) as client:
+            await client.send_message("Hello from the async event loop!")
+            print("Async message sent successfully!")
+    except NetworkError as e:
+        print(f"Network issue encountered: {e}")
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
 
 ### Advanced Usage
