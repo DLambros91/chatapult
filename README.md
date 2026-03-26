@@ -16,7 +16,7 @@ Chatapult is designed to make sending automated notifications, CI/CD alerts, and
 
 * **Zero Boilerplate:** Send a message to a Google Chat Space in three lines of code.
 * **Async Ready:** First-class support for `asyncio`, making it perfect for FastAPI, Discord bots, and high-concurrency event loops.
-* **Rich V2 Cards (Coming Soon):** Construct complex Google Chat Cards and Widgets using clean Python objects instead of nested JSON.
+* **Rich V2 Cards:** Construct complex Google Chat Cards and Widgets using clean Python objects instead of nested JSON.
 * **Threaded Replies:** Easily group related alerts by replying to specific message threads.
 * **Fully Typed:** Built with standard Python type hints for excellent IDE autocomplete and static checking.
 
@@ -50,6 +50,8 @@ except APIError as e:
     print(f"Failed to send message: {e}")
 ```
 
+![Sync Message](https://raw.githubusercontent.com/DLambros91/chatapult/refs/heads/main/images/example_sync_message.png)
+
 ### Asynchronous Usage
 
 Ideal for web servers, async task queues, or applications where you cannot block the main thread.
@@ -73,9 +75,52 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-### Advanced Usage
+![Async Message](https://raw.githubusercontent.com/DLambros91/chatapult/refs/heads/main/images/example_async_message.png)
 
-Documentation for sending V2 Cards, threaded replies, and handling rate-limit exceptions will be added here as features are released.
+### Advanced Usage: Sending Rich V2 Cards
+
+Google Chat's raw JSON for V2 Cards is heavily nested and prone to typos. Chatapult provides clean, typed dataclasses so you can build complex UI cards using standard Python objects.
+
+```python
+import os
+from chatapult import ChatClient
+from chatapult.models import (
+    CardWithId, Card, CardHeader, Section, Widget, TextParagraph
+)
+
+webhook_url = os.environ.get("GOOGLE_CHAT_WEBHOOK_URL")
+
+# 1. Build your Card using Python dataclasses
+alert_card = CardWithId(
+    cardId="server-alert-123",
+    card=Card(
+        header=CardHeader(
+            title="Production Alert 🚨",
+            subtitle="Database CPU Spiking",
+            imageUrl="[https://example.com/alert-icon.png](https://example.com/alert-icon.png)"
+        ),
+        sections=[
+            Section(
+                header="System Metrics",
+                widgets=[
+                    Widget(
+                        textParagraph=TextParagraph(
+                            text="<b>Primary DB</b> CPU utilization is at 98%."
+                        )
+                    )
+                ]
+            )
+        ]
+    )
+)
+
+# 2. Send the card!
+with ChatClient(webhook_url) as client:
+    client.send_message(cards=[alert_card])
+    print("Rich card sent successfully!")
+```
+
+![Card Message](https://raw.githubusercontent.com/DLambros91/chatapult/refs/heads/main/images/example_card_message.png)
 
 ## Contributing
 Contributions are welcome! If you'd like to help improve Chatapult, please review our [Contributing Guidelines](https://raw.githubusercontent.com/DLambros91/chatapult/refs/heads/main/CONTRIBUTING.md) and open an issue or pull request.

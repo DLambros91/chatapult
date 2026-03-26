@@ -1,10 +1,11 @@
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 
 import httpx
 
 # Import our new custom exceptions
 from .exceptions import APIError, ConfigurationError, NetworkError
+from .models import CardWithId
 
 logger = logging.getLogger(__name__)
 
@@ -32,24 +33,33 @@ class ChatClient:
         self._client = httpx.Client(timeout=timeout)
 
     def send_message(
-        self, text: str, thread_name: Optional[str] = None
+        self,
+        text: Optional[str] = None,
+        *,
+        cards: Optional[List[CardWithId]] = None,
+        thread_name: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
-        Send a simple text message to the configured Google Chat Space.
+        Sends a message to the Google Chat Space.
 
         Args:
-            text (str): The markdown-formatted text to send.
-            thread_name (Optional[str]): The ID of an existing thread to reply to
-                                         (e.g., 'spaces/SPACE_ID/threads/THREAD_ID').
-
-        Returns:
-            Dict[str, Any]: The JSON response from the Google Chat API representing the message.
-
-        Raises:
-            APIError: If the Google API returns a non-200 status code.
-            NetworkError: If the network connection times out or fails.
+            text: The plain text message to send.
+            cards: A list of rich V2 Cards to send.
+            thread_name: The resource name of the thread to reply to.
         """
-        payload: Dict[str, Any] = {"text": text}
+        if not text and not cards:
+            raise ValueError(
+                "You must provide either 'text' or 'cards' to send a message."
+            )
+
+        payload: Dict[str, Any] = {}
+
+        if text:
+            payload["text"] = text
+
+        if cards:
+            # Convert our dataclasses into clean dictionaries
+            payload["cardsV2"] = [card.to_dict() for card in cards]
 
         if thread_name:
             payload["thread"] = {"name": thread_name}
@@ -58,19 +68,13 @@ class ChatClient:
             response = self._client.post(self.webhook_url, json=payload)
             response.raise_for_status()
             return response.json()
-
         except httpx.HTTPStatusError as e:
-            logger.error(
-                f"Google Chat API error: {e.response.status_code} - {e.response.text}"
-            )
             raise APIError(
-                message=f"API request failed: {e.response.text}",
-                status_code=e.response.status_code,
+                f"Google Chat API returned {e.response.status_code}: {e.response.text}",
+                response=e.response,
             ) from e
-
         except httpx.RequestError as e:
-            logger.error(f"Network error while connecting to Google Chat: {e}")
-            raise NetworkError(f"Network request failed: {str(e)}") from e
+            raise NetworkError(f"Network error while sending message: {e}") from e
 
     def close(self) -> None:
         """Close the underlying HTTP client connections."""
