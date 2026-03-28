@@ -1,11 +1,11 @@
-"""Dataclass models for constructing Google Chat V2 rich UI cards."""
+"""Define dataclass models for constructing Google Chat V2 rich UI cards."""
 
 from dataclasses import dataclass, field, asdict
 from typing import List, Optional, Any, Dict
 
 
 def _clean_dict_factory(data: List[tuple]) -> Dict[str, Any]:
-    """Recursively removes keys with None values to satisfy the Google Chat API."""
+    """Recursively remove keys with None values to satisfy the Google Chat API."""
     return {k: v for k, v in data if v is not None}
 
 
