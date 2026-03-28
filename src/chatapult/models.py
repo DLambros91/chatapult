@@ -54,3 +54,25 @@ class Card(BaseModel):
 class CardWithId(BaseModel):
     cardId: str
     card: Card
+
+    @classmethod
+    def create_simple(
+        cls,
+        card_id: str,
+        title: str,
+        text: str,
+        subtitle: Optional[str] = None,
+        image_url: Optional[str] = None,
+    ) -> "CardWithId":
+        """
+        Helper method to instantly create a standard card without the boilerplate.
+        """
+        return cls(
+            cardId=card_id,
+            card=Card(
+                header=CardHeader(title=title, subtitle=subtitle, imageUrl=image_url),
+                sections=[
+                    Section(widgets=[Widget(textParagraph=TextParagraph(text=text))])
+                ],
+            ),
+        )

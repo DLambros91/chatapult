@@ -69,3 +69,12 @@ def test_full_card_assembly() -> None:
             ],
         },
     }
+
+
+def test_create_simple_card() -> None:
+    card = CardWithId.create_simple(card_id="test", title="Alert", text="CPU 99%")
+    assert card.cardId == "test"
+    assert card.card.header is not None
+    assert card.card.header.title == "Alert"
+    assert card.card.sections[0].widgets[0].textParagraph is not None
+    assert card.card.sections[0].widgets[0].textParagraph.text == "CPU 99%"

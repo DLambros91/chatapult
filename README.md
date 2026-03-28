@@ -120,6 +120,26 @@ with ChatClient(webhook_url) as client:
     print("Rich card sent successfully!")
 ```
 
+Or simply with
+
+```python
+import os
+from chatapult import ChatClient
+from chatapult.models import CardWithId
+
+webhook_url = os.environ.get("GOOGLE_CHAT_WEBHOOK_URL")
+
+alert_card = CardWithId.create_simple(
+    card_id="server-alert-1",
+    title="Production Alert 🚨",
+    subtitle="Database CPU Spiking",
+    text="<b>Primary DB</b> CPU utilization is at 98%."
+)
+
+with ChatClient(webhook_url) as client:
+    client.send_message(cards=[alert_card])
+```
+
 ![Card Message](https://raw.githubusercontent.com/DLambros91/chatapult/refs/heads/main/images/example_card_message.png)
 
 ## Contributing
