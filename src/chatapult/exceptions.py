@@ -5,6 +5,7 @@ clients.
 """
 
 from typing import Optional
+
 import httpx
 
 
@@ -35,10 +36,7 @@ class APIError(ChatapultError):
         Args:
             message: A human-readable error message.
             response: The original httpx.Response object that caused the error, if
-            available.
-
-        Returns:
-            Nothing.
+                      available.
         """
         super().__init__(message)
         self.response = response
