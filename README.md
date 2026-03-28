@@ -97,7 +97,7 @@ alert_card = CardWithId(
         header=CardHeader(
             title="Production Alert 🚨",
             subtitle="Database CPU Spiking",
-            imageUrl="[https://example.com/alert-icon.png](https://example.com/alert-icon.png)"
+            imageUrl="https://example.com/alert-icon.png"
         ),
         sections=[
             Section(
