@@ -6,6 +6,7 @@ from pytest_httpx import HTTPXMock
 from chatapult.client import ChatClient
 from chatapult.async_client import AsyncChatClient
 from chatapult.exceptions import APIError, ConfigurationError, NetworkError
+from chatapult.models import CardWithId, Card
 
 # Dummy webhook URL for testing
 WEBHOOK_URL = (
@@ -80,6 +81,32 @@ def test_sync_network_error(httpx_mock: HTTPXMock) -> None:
     assert "Connection timed out" in str(exc_info.value)
 
 
+def test_sync_send_message_with_cards(httpx_mock: HTTPXMock) -> None:
+    """Test sending a message containing a V2 Card."""
+    httpx_mock.add_response(json={}, status_code=200)
+
+    card = CardWithId(cardId="test-card", card=Card())
+
+    with ChatClient(WEBHOOK_URL) as client:
+        client.send_message(cards=[card])
+
+    request = httpx_mock.get_request()
+    assert request is not None
+    request_data = json.loads(request.read())
+
+    assert "cardsV2" in request_data
+    assert request_data["cardsV2"][0]["cardId"] == "test-card"
+
+
+def test_sync_empty_message() -> None:
+    """Test that sending a message without text or cards raises a ValueError."""
+    with ChatClient(WEBHOOK_URL) as client:
+        with pytest.raises(
+            ValueError, match="You must provide either 'text' or 'cards'"
+        ):
+            client.send_message()
+
+
 # ---------------------------------------------------------------------------
 # Asynchronous Client Tests
 # ---------------------------------------------------------------------------
@@ -140,3 +167,31 @@ async def test_async_network_error(httpx_mock: HTTPXMock) -> None:
     async with AsyncChatClient(WEBHOOK_URL) as client:
         with pytest.raises(NetworkError):
             await client.send_message("This will fail")
+
+
+@pytest.mark.asyncio
+async def test_async_send_message_with_cards(httpx_mock: HTTPXMock) -> None:
+    """Test sending an async message containing a V2 Card."""
+    httpx_mock.add_response(json={}, status_code=200)
+
+    card = CardWithId(cardId="test-card", card=Card())
+
+    async with AsyncChatClient(WEBHOOK_URL) as client:
+        await client.send_message(cards=[card])
+
+    request = httpx_mock.get_request()
+    assert request is not None
+    request_data = json.loads(request.read())
+
+    assert "cardsV2" in request_data
+    assert request_data["cardsV2"][0]["cardId"] == "test-card"
+
+
+@pytest.mark.asyncio
+async def test_async_empty_message() -> None:
+    """Test that sending an async message without text or cards raises a ValueError."""
+    async with AsyncChatClient(WEBHOOK_URL) as client:
+        with pytest.raises(
+            ValueError, match="You must provide either 'text' or 'cards'"
+        ):
+            await client.send_message()

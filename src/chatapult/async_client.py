@@ -1,21 +1,20 @@
-import logging
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 
 import httpx
 
 from .exceptions import APIError, ConfigurationError, NetworkError
-
-logger = logging.getLogger(__name__)
+from .models import CardWithId
 
 
 class AsyncChatClient:
-    """
-    An asynchronous client for interacting with Google Chat Webhooks.
+    """An asynchronous client for interacting with Google Chat Webhooks.
+
+    This client uses httpx's AsyncClient to send messages without blocking the event
+    loop.
     """
 
     def __init__(self, webhook_url: str, timeout: float = 10.0) -> None:
-        """
-        Initialize the AsyncChatClient.
+        """Initialize the AsyncChatClient.
 
         Args:
             webhook_url (str): The full Google Chat webhook URL.
@@ -31,23 +30,25 @@ class AsyncChatClient:
         self._client = httpx.AsyncClient(timeout=timeout)
 
     async def send_message(
-        self, text: str, thread_name: Optional[str] = None
+        self,
+        text: Optional[str] = None,
+        *,
+        cards: Optional[List[CardWithId]] = None,
+        thread_name: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """
-        Asynchronously send a simple text message to the Google Chat Space.
+        """Send an asynchronous message to the Google Chat Space."""
+        if not text and not cards:
+            raise ValueError(
+                "You must provide either 'text' or 'cards' to send a message."
+            )
 
-        Args:
-            text (str): The markdown-formatted text to send.
-            thread_name (Optional[str]): The ID of an existing thread to reply to.
+        payload: Dict[str, Any] = {}
 
-        Returns:
-            Dict[str, Any]: The JSON response from the Google Chat API.
+        if text:
+            payload["text"] = text
 
-        Raises:
-            APIError: If the Google API returns a non-200 status code.
-            NetworkError: If the connection times out or fails.
-        """
-        payload: Dict[str, Any] = {"text": text}
+        if cards:
+            payload["cardsV2"] = [card.to_dict() for card in cards]
 
         if thread_name:
             payload["thread"] = {"name": thread_name}
@@ -56,18 +57,13 @@ class AsyncChatClient:
             response = await self._client.post(self.webhook_url, json=payload)
             response.raise_for_status()
             return response.json()
-
         except httpx.HTTPStatusError as e:
-            logger.error(
-                f"Google Chat API error: {e.response.status_code} - {e.response.text}"
-            )
             raise APIError(
-                message=f"API request failed: {e.response.text}",
-                status_code=e.response.status_code,
+                f"Google Chat API returned {e.response.status_code}: {e.response.text}",
+                response=e.response,
             ) from e
         except httpx.RequestError as e:
-            logger.error(f"Network error while connecting to Google Chat: {e}")
-            raise NetworkError(f"Network request failed: {str(e)}") from e
+            raise NetworkError(f"Network error while sending message: {e}") from e
 
     async def aclose(self) -> None:
         """Close the underlying asynchronous HTTP client connections."""

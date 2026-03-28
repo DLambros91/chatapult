@@ -1,9 +1,9 @@
-"""
-Chatapult: A fast, Pythonic API wrapper for Google Chat webhooks.
+"""Chatapult.
+
+A fast, Pythonic API wrapper for Google Chat webhooks.
 """
 
-# Explicitly define the version so developers can check it programmatically
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 # Import the core components to expose them at the top level of the package
 from .client import ChatClient
