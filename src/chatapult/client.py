@@ -1,4 +1,3 @@
-import logging
 from typing import Any, Dict, Optional, List
 
 import httpx
@@ -6,8 +5,6 @@ import httpx
 # Import our new custom exceptions
 from .exceptions import APIError, ConfigurationError, NetworkError
 from .models import CardWithId
-
-logger = logging.getLogger(__name__)
 
 
 class ChatClient:
@@ -39,7 +36,7 @@ class ChatClient:
         cards: Optional[List[CardWithId]] = None,
         thread_name: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """Sends a message to the Google Chat Space.
+        """Send a message to the Google Chat Space.
 
         Args:
             text: The plain text message to send.
