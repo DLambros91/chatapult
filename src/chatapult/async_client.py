@@ -10,13 +10,14 @@ logger = logging.getLogger(__name__)
 
 
 class AsyncChatClient:
-    """
-    An asynchronous client for interacting with Google Chat Webhooks.
+    """An asynchronous client for interacting with Google Chat Webhooks.
+
+    This client uses httpx's AsyncClient to send messages without blocking the event
+    loop.
     """
 
     def __init__(self, webhook_url: str, timeout: float = 10.0) -> None:
-        """
-        Initialize the AsyncChatClient.
+        """Initialize the AsyncChatClient.
 
         Args:
             webhook_url (str): The full Google Chat webhook URL.

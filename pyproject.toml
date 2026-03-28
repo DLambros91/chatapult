@@ -45,3 +45,19 @@ dev = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/chatapult"]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+# E = pycodestyle, F = pyflakes, D = pydocstyle
+select = ["E", "F", "D"]
+
+# Ignore overly strict docstring rules
+ignore = [
+    "D100", # Missing docstring in public module (the file itself)
+    "D104", # Missing docstring in public package (__init__.py)
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"

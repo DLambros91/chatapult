@@ -11,13 +11,13 @@ logger = logging.getLogger(__name__)
 
 
 class ChatClient:
-    """
-    A synchronous client for interacting with Google Chat Webhooks.
+    """A synchronous client for interacting with Google Chat Webhooks.
+
+    This client uses httpx's Client to send messages in a blocking manner.
     """
 
     def __init__(self, webhook_url: str, timeout: float = 10.0) -> None:
-        """
-        Initialize the ChatClient.
+        """Initialize the ChatClient.
 
         Args:
             webhook_url (str): The full Google Chat webhook URL.
@@ -39,8 +39,7 @@ class ChatClient:
         cards: Optional[List[CardWithId]] = None,
         thread_name: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """
-        Sends a message to the Google Chat Space.
+        """Sends a message to the Google Chat Space.
 
         Args:
             text: The plain text message to send.

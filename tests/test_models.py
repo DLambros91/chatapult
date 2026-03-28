@@ -1,6 +1,4 @@
-"""
-Tests for the V2 Card dataclass models.
-"""
+"""Tests for the V2 Card dataclass models."""
 
 from chatapult.models import (
     CardWithId,
@@ -72,6 +70,11 @@ def test_full_card_assembly() -> None:
 
 
 def test_create_simple_card() -> None:
+    """Test the create_simple class method for quickly making a basic card.
+
+    This should create a card with the provided title and text, and leave
+    optional fields as None.
+    """
     card = CardWithId.create_simple(card_id="test", title="Alert", text="CPU 99%")
     assert card.cardId == "test"
     assert card.card.header is not None
