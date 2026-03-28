@@ -1,12 +1,9 @@
-import logging
 from typing import Any, Dict, Optional, List
 
 import httpx
 
 from .exceptions import APIError, ConfigurationError, NetworkError
 from .models import CardWithId
-
-logger = logging.getLogger(__name__)
 
 
 class AsyncChatClient:
@@ -39,7 +36,7 @@ class AsyncChatClient:
         cards: Optional[List[CardWithId]] = None,
         thread_name: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """Sends an asynchronous message to the Google Chat Space."""
+        """Send an asynchronous message to the Google Chat Space."""
         if not text and not cards:
             raise ValueError(
                 "You must provide either 'text' or 'cards' to send a message."
