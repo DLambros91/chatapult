@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional, List
 import httpx
 
 # Import our new custom exceptions
-from .exceptions import APIError, ConfigurationError, NetworkError
+from .exceptions import APIError, NetworkError
 from .models import CardWithId
 
 
@@ -21,10 +21,14 @@ class ChatClient:
             timeout (float): Connection timeout in seconds. Defaults to 10.0.
 
         Raises:
-            ConfigurationError: If the webhook_url is empty or invalid.
+                ValueError: If the webhook_url is empty or does not start with
+                    https://chat.googleapis.com/v1/spaces/
         """
-        if not webhook_url:
-            raise ConfigurationError("A valid webhook_url must be provided.")
+        if not webhook_url or not webhook_url.startswith("https://chat.googleapis.com/v1/spaces/"):
+            raise ValueError(
+                "A valid Google Chat webhook URL is required. "
+                "It must start with: https://chat.googleapis.com/v1/spaces/"
+            )
 
         self.webhook_url = webhook_url
         self._client = httpx.Client(timeout=timeout)

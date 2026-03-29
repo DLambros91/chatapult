@@ -21,7 +21,7 @@ WEBHOOK_URL = (
 
 def test_sync_client_init_empty_url() -> None:
     """Ensure ChatClient raises ConfigurationError if webhook is empty."""
-    with pytest.raises(ConfigurationError):
+    with pytest.raises(ValueError):
         ChatClient(webhook_url="")
 
 
@@ -106,7 +106,17 @@ def test_sync_empty_message() -> None:
         ):
             client.send_message()
 
+def test_chat_client_invalid_url_raises_value_error():
+    with pytest.raises(ValueError):
+        ChatClient("https://invalid-url.com")
 
+def test_async_chat_client_invalid_url_raises_value_error():
+    with pytest.raises(ValueError):
+        AsyncChatClient("https://invalid-url.com")
+
+def test_chat_client_empty_url_raises_value_error():
+    with pytest.raises(ValueError):
+        ChatClient("")
 # ---------------------------------------------------------------------------
 # Asynchronous Client Tests
 # ---------------------------------------------------------------------------
@@ -114,7 +124,7 @@ def test_sync_empty_message() -> None:
 
 def test_async_client_init_empty_url() -> None:
     """Ensure AsyncChatClient raises ConfigurationError if webhook is empty."""
-    with pytest.raises(ConfigurationError):
+    with pytest.raises(ValueError):
         AsyncChatClient(webhook_url="")
 
 
@@ -195,3 +205,4 @@ async def test_async_empty_message() -> None:
             ValueError, match="You must provide either 'text' or 'cards'"
         ):
             await client.send_message()
+
