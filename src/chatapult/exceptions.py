@@ -12,7 +12,11 @@ import httpx
 class ChatapultError(Exception):
     """Base exception for all Chatapult errors."""
 
-    pass
+    def __str__(self) -> str:
+        return super().__str__()
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({super().__str__()!r})"
 
 
 class ConfigurationError(ChatapultError):
@@ -41,3 +45,10 @@ class APIError(ChatapultError):
         super().__init__(message)
         self.response = response
         self.status_code = response.status_code if response is not None else None
+
+    def __str__(self) -> str:
+        status = f"[{self.status_code}] " if self.status_code else ""
+        return f"{status}{super().__str__()}"
+
+    def __repr__(self) -> str:
+        return f"APIError(message={super().__str__()!r}, status_code={self.status_code!r})"
