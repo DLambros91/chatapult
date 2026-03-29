@@ -36,7 +36,7 @@ jobs:
         run: ruff format --check .
 
       - name: Run mypy
-        run: mypy --python-version 3.8 src/
+        run: mypy --python-version 3.9 src/
 
   test:
     name: Test (Python ${{ matrix.python-version }})
