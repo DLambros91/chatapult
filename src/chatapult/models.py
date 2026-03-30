@@ -33,6 +33,48 @@ class TextParagraph(BaseModel):
 
 
 @dataclass
+class OpenLink(BaseModel):
+    """OpenLink action.
+
+    A link that opens when a widget is clicked.
+    """
+
+    url: str
+
+
+@dataclass
+class OnClick(BaseModel):
+    """OnClick action.
+
+    An action that happens when a user clicks a widget.
+    """
+
+    openLink: Optional[OpenLink] = None
+
+
+@dataclass
+class Button(BaseModel):
+    """Button widget.
+
+    A button that can be clicked
+    """
+
+    text: str
+    onClick: OnClick
+    # Can also be added an icon.
+
+
+@dataclass
+class ButtonList(BaseModel):
+    """ButtonList widget.
+
+    A list of buttons displayed.
+    """
+
+    buttons: List[Button] = field(default_factory=list)
+
+
+@dataclass
 class Widget(BaseModel):
     """Widget.
 
@@ -40,7 +82,8 @@ class Widget(BaseModel):
     """
 
     textParagraph: Optional[TextParagraph] = None
-    # Future widgets (Image, ButtonList, etc.) can be added here as Optional fields.
+    buttonList: Optional[ButtonList] = None
+    # More widgets (Eg: Images) can be added here as Optional fields.
 
 
 @dataclass
