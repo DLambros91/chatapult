@@ -4,7 +4,7 @@ import httpx
 
 # Import our new custom exceptions
 from .exceptions import APIError, ConfigurationError, NetworkError
-from .models import CardWithId
+from .models import CardWithId, MessageResponse
 
 
 class ChatClient:
@@ -35,13 +35,23 @@ class ChatClient:
         *,
         cards: Optional[List[CardWithId]] = None,
         thread_name: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        thread_key: Optional[str] = None,
+    ) -> MessageResponse:
         """Send a message to the Google Chat Space.
 
         Args:
             text: The plain text message to send.
             cards: A list of rich V2 Cards to send.
             thread_name: The resource name of the thread to reply to.
+            thread_key: The key for the thread to reply to.
+
+        Returns:
+            MessageResponse: The parsed response from the Google Chat API.
+
+        Raises:
+            ValueError: If neither 'text' nor 'cards' is provided.
+            APIError: If the Google Chat API returns an HTTP error status.
+            NetworkError: If there is a network-level failure making the request.
         """
         if not text and not cards:
             raise ValueError(
@@ -57,13 +67,18 @@ class ChatClient:
             # Convert our dataclasses into clean dictionaries
             payload["cardsV2"] = [card.to_dict() for card in cards]
 
-        if thread_name:
+        if thread_key:
+            payload["thread"] = {"threadKey": thread_key}
+        elif thread_name:
             payload["thread"] = {"name": thread_name}
 
         try:
-            response = self._client.post(self.webhook_url, json=payload)
+            params = {}
+            if thread_key:
+                params["messageReplyOption"] = "REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD"
+            response = self._client.post(self.webhook_url, params=params, json=payload)
             response.raise_for_status()
-            return response.json()
+            return MessageResponse.from_dict(response.json())
         except httpx.HTTPStatusError as e:
             raise APIError(
                 f"Google Chat API returned {e.response.status_code}: {e.response.text}",
