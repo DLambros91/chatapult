@@ -109,3 +109,28 @@ class CardWithId(BaseModel):
                 ],
             ),
         )
+
+
+@dataclass
+class Thread(BaseModel):
+    """Represents a Google Chat thread."""
+
+    name: Optional[str] = None
+    threadKey: Optional[str] = None
+
+
+@dataclass
+class MessageResponse(BaseModel):
+    """Represents the response returned by Google Chat API after sending a message."""
+
+    name: str
+    text: Optional[str] = None
+    thread: Optional[Thread] = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "MessageResponse":
+        """Parses the raw JSON dictionary from Google into a MessageResponse object."""
+        thread_data = data.get("thread")
+        thread_obj = Thread(**thread_data) if thread_data else None
+
+        return cls(name=data.get("name", ""), text=data.get("text"), thread=thread_obj)
