@@ -56,7 +56,7 @@ class OnClick(BaseModel):
 class Button(BaseModel):
     """Button widget.
 
-    A button that can be clicked
+    A button that can be clicked.
     """
 
     text: str
