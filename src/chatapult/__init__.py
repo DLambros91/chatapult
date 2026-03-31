@@ -13,6 +13,7 @@ from .exceptions import (
     ChatapultError,
     ConfigurationError,
     NetworkError,
+    RateLimitError,
 )
 
 # The __all__ list strictly defines the public API of your module.
@@ -25,4 +26,5 @@ __all__ = [
     "ChatapultError",
     "ConfigurationError",
     "NetworkError",
+    "RateLimitError",
 ]

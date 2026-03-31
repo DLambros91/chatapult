@@ -29,6 +29,7 @@ classifiers = [
 # httpx handles both sync and async requests, keeping our footprint small.
 dependencies = [
     "httpx>=0.24.0",
+    "tenacity>=9.0.0",
 ]
 
 [project.optional-dependencies]
@@ -61,3 +62,8 @@ ignore = [
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[dependency-groups]
+dev = [
+    "pre-commit>=3.5.0",
+]
