@@ -8,7 +8,7 @@ Chatapult is designed to make sending automated notifications, CI/CD alerts, and
 
 [![PyPI Version](https://img.shields.io/pypi/v/chatapult.svg)](https://pypi.org/project/chatapult/)
 [![Python Versions](https://img.shields.io/pypi/pyversions/chatapult.svg)](https://pypi.org/project/chatapult/)
-![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)
+[![codecov](https://codecov.io/gh/DLambros91/chatapult/graph/badge.svg?token=A5ZYCGQDGC)](https://codecov.io/gh/DLambros91/chatapult)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://raw.githubusercontent.com/DLambros91/chatapult/refs/heads/main/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
