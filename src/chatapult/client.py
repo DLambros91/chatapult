@@ -13,12 +13,12 @@ class ChatClient:
     This client uses httpx's Client to send messages in a blocking manner.
     """
 
-    def __init__(self, webhook_url: str, timeout: float = 10.0) -> None:
+    def __init__(self, webhook_url: str, timeout: [float, int] = 10.0) -> None:
         """Initialize the ChatClient.
 
         Args:
             webhook_url (str): The full Google Chat webhook URL.
-            timeout (float): Connection timeout in seconds. Defaults to 10.0.
+            timeout ([float, int]): Connection timeout in seconds. Defaults to 10.0.
 
         Raises:
             ConfigurationError: If the webhook_url is empty or invalid.
