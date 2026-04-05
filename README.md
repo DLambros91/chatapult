@@ -52,6 +52,22 @@ except APIError as e:
 
 ![Sync Message](https://raw.githubusercontent.com/DLambros91/chatapult/refs/heads/main/images/example_sync_message.png)
 
+### Mentioning Users
+
+Chatapult provides helper functions for Google Chat user mentions.
+```python
+from chatapult.formatters import mention_all, mention_user
+
+# Mention everyone in the space
+text = f"{mention_all()} Heads up, deployment is starting!"
+
+# Mention a specific user by ID
+text = f"Please review this PR from {mention_user('12345')}."
+
+with ChatClient(webhook_url) as client:
+    client.send_message(text)
+```
+
 ### Asynchronous Usage
 
 Ideal for web servers, async task queues, or applications where you cannot block the main thread.
