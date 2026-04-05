@@ -2,6 +2,8 @@ name: CI
 
 on:
   push:
+    branches:
+      - main
   pull_request:
 
 concurrency:
@@ -61,11 +63,17 @@ jobs:
           pip install -e ".[dev]"
 
       - name: Run tests with coverage
-        run: pytest --cov=src/chatapult --cov-report=term-missing --cov-report=xml
+        run: pytest --cov=src/chatapult --cov-report=term-missing --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
 
       - name: Upload coverage to Codecov
-        if: matrix.python-version == '3.12'
+        if: matrix.python-version == '3.12' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v5
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
           fail_ci_if_error: false
+      - name: Upload test results to Codecov
+        if: "!cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main'"
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
