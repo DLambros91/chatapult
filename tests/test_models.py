@@ -7,6 +7,10 @@ from chatapult.models import (
     Section,
     Widget,
     TextParagraph,
+    OpenLink,
+    OnClick,
+    Button,
+    ButtonList,
 )
 
 
@@ -16,6 +20,46 @@ def test_text_paragraph_serialization() -> None:
     data = widget.to_dict()
 
     assert data == {"textParagraph": {"text": "Hello, Chat!"}}
+
+
+def test_button_list_serialization() -> None:
+    """Test that a button list with button and open link serializes correctly."""
+    open_link = OpenLink(url="https://github.com/DLambros91/chatapult")
+    on_click = OnClick(openLink=open_link)
+    button = Button(text="Chatapult Github", onClick=on_click)
+
+    widget = Widget(buttonList=ButtonList(buttons=[button]))
+
+    data = widget.to_dict()
+
+    assert data == {
+        "buttonList": {
+            "buttons": [
+                {
+                    "text": "Chatapult Github",
+                    "onClick": {
+                        "openLink": {"url": "https://github.com/DLambros91/chatapult"}
+                    },
+                }
+            ]
+        }
+    }
+
+
+def test_multiple_buttons_serialization() -> None:
+    """Test that multiple buttons in a buttonList are serialized."""
+    button1 = Button(
+        text="Button 1", onClick=OnClick(openLink=OpenLink(url="url_test1"))
+    )
+    button2 = Button(
+        text="Button 2", onClick=OnClick(openLink=OpenLink(url="url_test2"))
+    )
+
+    widget = Widget(buttonList=ButtonList(buttons=[button1, button2]))
+    data = widget.to_dict()
+
+    assert len(data["buttonList"]["buttons"]) == 2
+    assert data["buttonList"]["buttons"][1]["text"] == "Button 2"
 
 
 def test_card_serialization_drops_none() -> None:
