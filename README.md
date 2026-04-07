@@ -83,8 +83,10 @@ if __name__ == "__main__":
 Both `ChatClient` and `AsyncChatClient` accept an optional `timeout` argument (`float` or `int`, in seconds). It is passed to the underlying HTTP client so slow or stuck requests fail instead of waiting indefinitely. The default is `10.0`.
 
 ```python
+import os
 from chatapult import ChatClient, AsyncChatClient
 
+webhook_url = os.environ.get("GOOGLE_CHAT_WEBHOOK_URL")
 # Abort the request if it takes longer than 30 seconds (same for sync and async)
 with ChatClient(webhook_url, timeout=30) as client:
     client.send_message("Hello!")
