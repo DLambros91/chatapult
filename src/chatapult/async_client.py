@@ -21,13 +21,15 @@ class AsyncChatClient:
             timeout (float): Connection timeout in seconds. Defaults to 10.0.
 
         Raises:
-                ValueError: If the webhook_url is empty or does not start with
-                    https://chat.googleapis.com/v1/spaces/
+            ValueError: If the webhook_url is empty or does not start with
+                https://chat.googleapis.com/v1/spaces/
         """
-        if not webhook_url or not webhook_url.startswith("https://chat.googleapis.com/v1/spaces/"):
+        _WEBHOOK_PREFIX = "https://chat.googleapis.com/v1/spaces/"
+
+        if not webhook_url or not webhook_url.startswith(_WEBHOOK_PREFIX):
             raise ValueError(
                 "A valid Google Chat webhook URL is required. "
-                "It must start with: https://chat.googleapis.com/v1/spaces/"
+                f"It must start with: {_WEBHOOK_PREFIX}"
             )
 
         self.webhook_url = webhook_url

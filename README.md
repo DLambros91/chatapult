@@ -56,7 +56,11 @@ except APIError as e:
 
 Chatapult provides helper functions for Google Chat user mentions.
 ```python
+import os
+from chatapult import ChatClient
 from chatapult.formatters import mention_all, mention_user
+
+webhook_url = os.environ.get("GOOGLE_CHAT_WEBHOOK_URL")
 
 # Mention everyone in the space
 text = f"{mention_all()} Heads up, deployment is starting!"

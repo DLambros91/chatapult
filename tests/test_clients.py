@@ -5,7 +5,7 @@ from pytest_httpx import HTTPXMock
 
 from chatapult.client import ChatClient
 from chatapult.async_client import AsyncChatClient
-from chatapult.exceptions import APIError, ConfigurationError, NetworkError
+from chatapult.exceptions import APIError, NetworkError
 from chatapult.models import CardWithId, Card
 
 # Dummy webhook URL for testing
@@ -20,7 +20,7 @@ WEBHOOK_URL = (
 
 
 def test_sync_client_init_empty_url() -> None:
-    """Ensure ChatClient raises ConfigurationError if webhook is empty."""
+    """Ensure ChatClient raises ValueError if webhook is empty."""
     with pytest.raises(ValueError):
         ChatClient(webhook_url="")
 
@@ -106,24 +106,32 @@ def test_sync_empty_message() -> None:
         ):
             client.send_message()
 
-def test_chat_client_invalid_url_raises_value_error():
+
+def test_chat_client_invalid_url_raises_value_error() -> None:
+    """Test that ChatClient raises ValueError for an invalid webhook URL."""
     with pytest.raises(ValueError):
         ChatClient("https://invalid-url.com")
 
-def test_async_chat_client_invalid_url_raises_value_error():
+
+def test_async_chat_client_invalid_url_raises_value_error() -> None:
+    """Test that AsyncChatClient raises ValueError for an invalid webhook URL."""
     with pytest.raises(ValueError):
         AsyncChatClient("https://invalid-url.com")
 
-def test_chat_client_empty_url_raises_value_error():
+
+def test_chat_client_empty_url_raises_value_error() -> None:
+    """Test that ChatClient raises ValueError for an empty webhook URL."""
     with pytest.raises(ValueError):
         ChatClient("")
+
+
 # ---------------------------------------------------------------------------
 # Asynchronous Client Tests
 # ---------------------------------------------------------------------------
 
 
 def test_async_client_init_empty_url() -> None:
-    """Ensure AsyncChatClient raises ConfigurationError if webhook is empty."""
+    """Ensure AsyncChatClient raises ValueError if webhook is empty."""
     with pytest.raises(ValueError):
         AsyncChatClient(webhook_url="")
 
@@ -205,4 +213,3 @@ async def test_async_empty_message() -> None:
             ValueError, match="You must provide either 'text' or 'cards'"
         ):
             await client.send_message()
-

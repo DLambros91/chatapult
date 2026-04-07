@@ -1,7 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""
-Helper functions for Google Chat mention formatting.
-"""
+"""Helper functions for Google Chat mention formatting."""
 
 
 def mention_all() -> str:
