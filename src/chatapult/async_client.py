@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, Optional, List, Union
 
 import httpx
 
@@ -13,12 +13,13 @@ class AsyncChatClient:
     loop.
     """
 
-    def __init__(self, webhook_url: str, timeout: float = 10.0) -> None:
+    def __init__(self, webhook_url: str, timeout: Union[float, int] = 10.0) -> None:
         """Initialize the AsyncChatClient.
 
         Args:
             webhook_url (str): The full Google Chat webhook URL.
-            timeout (float): Connection timeout in seconds. Defaults to 10.0.
+            timeout (Union[float, int]): Request timeout in seconds.
+                Defaults to 10.0. Optional.
 
         Raises:
             ConfigurationError: If the webhook_url is empty.

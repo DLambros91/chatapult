@@ -19,6 +19,7 @@ Chatapult is designed to make sending automated notifications, CI/CD alerts, and
 * **Rich V2 Cards:** Construct complex Google Chat Cards and Widgets using clean Python objects instead of nested JSON.
 * **Threaded Replies:** Easily group related alerts by replying to specific message threads.
 * **Fully Typed:** Built with standard Python type hints for excellent IDE autocomplete and static checking.
+* **Configurable timeouts:** Set how long each HTTP request may take before it is aborted (default 10 seconds).
 
 ## Installation
 
@@ -76,6 +77,27 @@ if __name__ == "__main__":
 ```
 
 ![Async Message](https://raw.githubusercontent.com/DLambros91/chatapult/refs/heads/main/images/example_async_message.png)
+
+### Request timeout
+
+Both `ChatClient` and `AsyncChatClient` accept an optional `timeout` argument (`float` or `int`, in seconds). It is passed to the underlying HTTP client so slow or stuck requests fail instead of waiting indefinitely. The default is `10.0`.
+
+```python
+import os
+from chatapult import ChatClient, AsyncChatClient
+import asyncio
+from chatapult import ChatClient, AsyncChatClient
+
+# Abort the request if it takes longer than 30 seconds (same for sync and async)
+with ChatClient(webhook_url, timeout=30) as client:
+    client.send_message("Hello!")
+
+async def main():
+    async with AsyncChatClient(webhook_url, timeout=30) as client:
+        await client.send_message("Hello!")
+
+asyncio.run(main())
+```
 
 ### Advanced Usage: Sending Rich V2 Cards
 
