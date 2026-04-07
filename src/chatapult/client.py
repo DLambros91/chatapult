@@ -18,7 +18,7 @@ class ChatClient:
 
         Args:
             webhook_url (str): The full Google Chat webhook URL.
-            timeout (Union[float, int]): Connection timeout in seconds.
+            timeout (Union[float, int]): Request timeout in seconds.
             Defaults to 10.0. Optional.
 
         Raises:
