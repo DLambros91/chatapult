@@ -85,14 +85,18 @@ Both `ChatClient` and `AsyncChatClient` accept an optional `timeout` argument (`
 ```python
 import os
 from chatapult import ChatClient, AsyncChatClient
+import asyncio
+from chatapult import ChatClient, AsyncChatClient
 
-webhook_url = os.environ.get("GOOGLE_CHAT_WEBHOOK_URL")
 # Abort the request if it takes longer than 30 seconds (same for sync and async)
 with ChatClient(webhook_url, timeout=30) as client:
     client.send_message("Hello!")
 
-async with AsyncChatClient(webhook_url, timeout=30) as client:
-    await client.send_message("Hello!")
+async def main():
+    async with AsyncChatClient(webhook_url, timeout=30) as client:
+        await client.send_message("Hello!")
+
+asyncio.run(main())
 ```
 
 ### Advanced Usage: Sending Rich V2 Cards
