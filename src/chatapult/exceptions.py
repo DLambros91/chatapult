@@ -4,7 +4,9 @@ This module defines a hierarchy of exceptions that can be raised by the Chatapul
 clients.
 """
 
+from email.utils import parsedate_to_datetime
 from typing import Optional
+import datetime
 
 import httpx
 
@@ -43,6 +45,35 @@ class APIError(ChatapultError):
         self.status_code = response.status_code if response is not None else None
 
 
+def _parse_retry_after(value: str) -> Optional[float]:
+    """Parse a Retry-After header value into a non-negative delay in seconds.
+
+    Supports both the delay-seconds form (e.g. ``"30"``) and the HTTP-date
+    form (e.g. ``"Thu, 01 Jan 2026 00:00:00 GMT"``).  Negative delay-seconds
+    values are clamped to 0.  Returns ``None`` when the value cannot be
+    parsed.
+
+    Args:
+        value: The stripped Retry-After header string.
+
+    Returns:
+        Seconds to wait as a non-negative float, or ``None`` if unparseable.
+    """
+    # Try delay-seconds form first.
+    try:
+        return max(0.0, float(value))
+    except ValueError:
+        pass
+
+    # Try HTTP-date form (RFC 7231).
+    try:
+        retry_date = parsedate_to_datetime(value)
+        now = datetime.datetime.now(datetime.timezone.utc)
+        return max(0.0, (retry_date - now).total_seconds())
+    except Exception:
+        return None
+
+
 class RateLimitError(APIError):
     """Raised when the Google Chat API returns a 429 Too Many Requests status."""
 
@@ -64,10 +95,12 @@ class RateLimitError(APIError):
         super().__init__(message, response=response)
         self.retry_after: Optional[float] = None
         if response is not None:
-            # checking if headers are coming from google chat or not
             raw = response.headers.get("Retry-After")
             if raw is not None:
-                try:
-                    self.retry_after = float(raw)
-                except ValueError:
-                    self.retry_after = None
+                self.retry_after = _parse_retry_after(raw.strip())
+
+
+class ServerError(APIError):
+    """Raised when the API returns a 5xx server error status."""
+
+    pass

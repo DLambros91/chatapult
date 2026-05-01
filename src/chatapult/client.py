@@ -3,7 +3,13 @@ from typing import Any, Dict, Optional, List
 import httpx
 
 # Import our new custom exceptions
-from .exceptions import APIError, ConfigurationError, NetworkError, RateLimitError
+from .exceptions import (
+    APIError,
+    ConfigurationError,
+    NetworkError,
+    RateLimitError,
+    ServerError,
+)
 from .models import CardWithId
 
 from .utils import retry_upon_rate_limit
@@ -50,6 +56,12 @@ class ChatClient:
         """
         if not webhook_url:
             raise ConfigurationError("A valid webhook_url must be provided.")
+        if max_retries < 0:
+            raise ConfigurationError("max_retries must be >= 0.")
+        if retry_wait_min < 0:
+            raise ConfigurationError("retry_wait_min must be >= 0.")
+        if retry_wait_max < retry_wait_min:
+            raise ConfigurationError("retry_wait_max must be >= retry_wait_min.")
 
         self.webhook_url = webhook_url
         self._client = httpx.Client(timeout=timeout)
@@ -102,6 +114,12 @@ class ChatClient:
                 if e.response.status_code == 429:
                     raise RateLimitError(
                         f"Google Chat API rate limited (429): {e.response.text}",
+                        response=e.response,
+                    ) from e
+                if e.response.status_code >= 500:
+                    raise ServerError(
+                        f"Google Chat API server error "
+                        f"({e.response.status_code}): {e.response.text}",
                         response=e.response,
                     ) from e
                 raise APIError(

@@ -210,3 +210,6 @@ __marimo__/
 # Intellij
 .idea/
 uv.lock
+
+# asdf
+.tool-versions

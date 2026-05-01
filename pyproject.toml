@@ -47,6 +47,10 @@ dev = [
 [tool.hatch.build.targets.wheel]
 packages = ["src/chatapult"]
 
+[tool.black]
+target-version = ["py38", "py39", "py310", "py311", "py312"]
+line-length = 88
+
 [tool.ruff]
 line-length = 88
 
@@ -62,8 +66,3 @@ ignore = [
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
-
-[dependency-groups]
-dev = [
-    "pre-commit>=3.5.0",
-]
