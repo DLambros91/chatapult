@@ -3,8 +3,16 @@ from typing import Any, Dict, Optional, List
 import httpx
 
 # Import our new custom exceptions
-from .exceptions import APIError, ConfigurationError, NetworkError
+from .exceptions import (
+    APIError,
+    ConfigurationError,
+    NetworkError,
+    RateLimitError,
+    ServerError,
+)
 from .models import CardWithId
+
+from .utils import retry_upon_rate_limit
 
 
 class ChatClient:
@@ -13,21 +21,53 @@ class ChatClient:
     This client uses httpx's Client to send messages in a blocking manner.
     """
 
-    def __init__(self, webhook_url: str, timeout: float = 10.0) -> None:
+    def __init__(
+        self,
+        webhook_url: str,
+        timeout: float = 10.0,
+        max_retries: int = 3,
+        retry_wait_min: float = 1.0,
+        retry_wait_max: float = 60.0,
+    ) -> None:
         """Initialize the ChatClient.
 
+        Configures HTTP client and retry mechanism for sending
+        messages to a Google Chat webhook.
+
+        Attributes:
+            webhook_url: The URL of the webhook to which
+                requests will be sent.
+
         Args:
-            webhook_url (str): The full Google Chat webhook URL.
-            timeout (float): Connection timeout in seconds. Defaults to 10.0.
+            webhook_url: The webhook URL as a string. Must be
+                a valid and non-empty URL.
+            timeout: Timeout for HTTP requests in seconds.
+                Defaults to 10.0.
+            max_retries: Maximum number of retries for failed
+                requests. Defaults to 3.
+            retry_wait_min: Minimum wait time between retries
+                in seconds. Defaults to 1.0.
+            retry_wait_max: Maximum wait time between retries
+                in seconds. Defaults to 60.0.
 
         Raises:
-            ConfigurationError: If the webhook_url is empty or invalid.
+            ConfigurationError: If an invalid or empty
+                webhook_url is provided.
         """
         if not webhook_url:
             raise ConfigurationError("A valid webhook_url must be provided.")
+        if max_retries < 0:
+            raise ConfigurationError("max_retries must be >= 0.")
+        if retry_wait_min < 0:
+            raise ConfigurationError("retry_wait_min must be >= 0.")
+        if retry_wait_max < retry_wait_min:
+            raise ConfigurationError("retry_wait_max must be >= retry_wait_min.")
 
         self.webhook_url = webhook_url
         self._client = httpx.Client(timeout=timeout)
+        self._max_retries = max_retries
+        self._retry_wait_min = retry_wait_min
+        self._retry_wait_max = retry_wait_max
 
     def send_message(
         self,
@@ -60,17 +100,38 @@ class ChatClient:
         if thread_name:
             payload["thread"] = {"name": thread_name}
 
-        try:
-            response = self._client.post(self.webhook_url, json=payload)
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            raise APIError(
-                f"Google Chat API returned {e.response.status_code}: {e.response.text}",
-                response=e.response,
-            ) from e
-        except httpx.RequestError as e:
-            raise NetworkError(f"Network error while sending message: {e}") from e
+        @retry_upon_rate_limit(
+            max_retries=self._max_retries,
+            retry_wait_max=self._retry_wait_max,
+            retry_wait_min=self._retry_wait_min,
+        )
+        def _do_post() -> Dict[str, Any]:
+            try:
+                response = self._client.post(self.webhook_url, json=payload)
+                response.raise_for_status()
+                return response.json()
+            except httpx.HTTPStatusError as e:
+                if e.response.status_code == 429:
+                    raise RateLimitError(
+                        f"Google Chat API rate limited (429): {e.response.text}",
+                        response=e.response,
+                    ) from e
+                if e.response.status_code >= 500:
+                    raise ServerError(
+                        f"Google Chat API server error "
+                        f"({e.response.status_code}): {e.response.text}",
+                        response=e.response,
+                    ) from e
+                raise APIError(
+                    f"Google Chat API returned "
+                    f"{e.response.status_code}: "
+                    f"{e.response.text}",
+                    response=e.response,
+                ) from e
+            except httpx.RequestError as e:
+                raise NetworkError(f"Network error while sending message: {e}") from e
+
+        return _do_post()
 
     def close(self) -> None:
         """Close the underlying HTTP client connections."""
